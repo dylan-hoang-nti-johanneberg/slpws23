@@ -7,5 +7,17 @@ require_relative './model.rb'
 enable :sessions
 
 get('/') do
-    slim(:index)
+    slim(:home)
 end
+
+get('/lists') do
+
+    slim(:lists)
+end
+
+get('/login') do
+end
+
+get('/register') do 
+end
+
