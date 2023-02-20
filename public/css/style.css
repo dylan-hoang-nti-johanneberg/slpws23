@@ -1,7 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans&family=Frank+Ruhl+Libre&family=Inter:wght@300&family=Open+Sans&family=Oxygen:wght@300&family=PT+Sans&display=swap');
+
 * {
     margin: 0;
 }
 
 header {
+    display: flex;
+    align-items: center;
+    height: 75px;
+    padding-left: 10px;
     background-color: #2564DA;
+}
+
+header .title {
+    color: white;
+    transition-duration: 0.2s;
+}
+header .title:hover {
+    color: black;
+}
+
+.title {
+    font-size: 34px;
+}
+
+.removeDeco {
+    text-decoration: none;
+}
+
+.openSans {
+    font-family: 'Open Sans', sans-serif;
+}
+
+.helvetica {
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+#wrapper {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 50px;
+}
+
+#formCreation form {
+    display: flex;
+    flex-direction: column;
 }
