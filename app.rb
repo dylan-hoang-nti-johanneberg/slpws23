@@ -2,10 +2,37 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'slim'
 require 'sqlite3'
-require_relative 'model'
+# require_relative 'model'
 enable :sessions
 
-db = SQLite3::Database.new("db/data.db")
+$db = SQLite3::Database.new("db/data.db")
+$db.results_as_hash = true
+
+$dbProducts = SQLite3::Database.new("db/products.db")
+$dbProducts.results_as_hash = true
+
+class DBexecutor
+    def insertIntoPCList(name, cpu, gpu, ram, mobo, psu, ssd)
+        $db.execute("INSERT INTO computerList(name, cpu, gpu, ram, mobo, psu, ssd) VALUES(?,?,?,?,?,?,?)", name, cpu, gpu, ram, mobo, psu, ssd)
+    end
+
+    def readPCList()
+        return $db.execute("SELECT id, name FROM computerList")
+    end
+
+    def readPCListContent(id)
+        return $db.execute("SELECT * FROM computerList WHERE id = ?", id)
+    end
+
+    def deletePCList(id)
+        $db.execute("DELETE FROM computerList WHERE id = ?", id)
+    end
+
+    def readAllProducts(category)
+        selectTable = "SELECT * FROM #{category}"
+        $dbProducts.execute(selectTable)
+    end
+end
 
 get('/') do
     slim(:home)
@@ -17,7 +44,16 @@ get('/lists') do
 end
 
 get('/lists/new') do
-
+    @partTypes = ['CPU', 'GPU']
+    @components = DBexecutor.new.readAllProducts(@partTypes[0])
+    for component in @components
+        component["Model"] = component["Model"].split(/ /, 3)
+        if component["Model"][1] == "Ryzen"
+            component["Model"] = "AMD #{component["Model"][1]} #{component["Model"][2]}"
+        elsif component["Model"][1] == "Core"
+            component["Model"] = "Intel #{component["Model"][1]} #{component["Model"][2]}"
+        end
+    end
     slim(:"computerLists/new")
 end
 
@@ -43,6 +79,7 @@ post('/lists/:id/delete') do
     listID = params[:id]
     DBexecutor.new.deletePCList(listID)
     redirect('/lists')
+
 end
 
 get('/login') do

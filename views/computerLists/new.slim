@@ -11,4 +11,9 @@ main id="wrapper"
             input type="text" name="ssd" placeholder="SSD"
             input type="submit" value="Create PC" class="postBtn"
     section id="itemListView"
-        p Lorem ipsum dolor sit amet consectetur adipisicing elit. Illo, ducimus!
+        - @partTypes.each do |partType|
+            button #{partType}
+        / - i = 0
+        - @components.each do |component|
+            li #{component["Model"]} #{component["Clock"]}
+            
