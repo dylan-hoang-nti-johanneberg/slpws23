@@ -21,7 +21,9 @@ class DBexecutor
     end
 
     def readPCListContent(id)
-        return $db.execute("SELECT * FROM computerList WHERE id = ?", id)
+        pcComponents = $db.execute("SELECT cpu, gpu, ram, mobo psu, ssd FROM computerList WHERE id = ?", id)
+        pcDescription = $db.execute("SELECT * FROM computerList WHERE id = ?", id)
+        return pcComponents, pcDescription
     end
 
     def deletePCList(id)
@@ -44,7 +46,7 @@ get('/lists') do
 end
 
 get('/lists/new') do
-    @partTypes = ['CPU', 'GPU']
+    @partTypes = ['CPU', 'GPU', 'RAM']
     @components = DBexecutor.new.readAllProducts(@partTypes[0])
     for component in @components
         component["Model"] = component["Model"].split(/ /, 3)
@@ -58,7 +60,7 @@ get('/lists/new') do
 end
 
 get('/lists/:id') do
-    @components = DBexecutor.new.readPCListContent(params[:id])
+    @components, @pcInfo= DBexecutor.new.readPCListContent(params[:id])
     slim(:"computerLists/showList")
 end
 

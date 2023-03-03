@@ -1,1 +1,17 @@
-p #{@components}
+a href="/lists" Return
+section#listViewWrapper
+    h2 class="title helvetica" #{@pcInfo[0]["name"]}
+    hr
+    table.pcView
+        tr.helvetica.tableDesc
+            th  
+            th Product
+            th Price
+            th Store
+        - @components[0].each do |comp|
+            tr.helvetica.tableDesc
+                - comp[0] = comp[0].upcase
+                td #{comp[0]} 
+                td #{comp[1]}
+            / br
+            

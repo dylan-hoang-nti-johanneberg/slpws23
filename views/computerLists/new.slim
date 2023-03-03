@@ -1,19 +1,27 @@
-a href="/lists" Return.
+a href="/lists" Return
 main id="wrapper"
     section id="formCreation"
         form action="/lists" method="POST"
             input type="text" name="listName" placeholder="PC List Name"
-            input type="text" name="cpu" placeholder="CPU"
+            input id="CPUForm" type="text" name="cpu" placeholder="CPU" readonly = true
             input type="text" name="gpu" placeholder="GPU"
             input type="text" name="ram" placeholder="RAM"
             input type="text" name="mobo" placeholder="MOBO"
             input type="text" name="psu" placeholder="PSU"
             input type="text" name="ssd" placeholder="SSD"
-            input type="submit" value="Create PC" class="postBtn"
+            input type="submit" value="Create PC" class="postBtn helvetica"
     section id="itemListView"
-        - @partTypes.each do |partType|
-            button #{partType}
-        / - i = 0
-        - @components.each do |component|
-            li #{component["Model"]} #{component["Clock"]}
-            
+        section#componentTypes  
+            - @partTypes.each do |partType|
+                button class="" #{partType}
+        ul.componentInList 
+            - @components.each do |component|
+                section.item    
+                    li class="componentTitle" #{component["Model"]}
+                    section.description 
+                        label class="componentDesc openSans" #{component["Clock"]}
+                        label |
+                        label class="componentDesc openSans" #{component["Cores"]}
+                    button class="addToListbtn" ADD
+                hr
+script src="/js/main.js" 
