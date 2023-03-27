@@ -1,6 +1,0 @@
-section class="openSans"
-    / p #{@lists}
-    - @lists.each do |list|
-        a href="/lists/#{list["id"]}"  #{list["name"]}
-        form action="/lists/#{list["id"]}/delete" method="post" 
-            input type="submit" value="Del" class="postBtn"

@@ -1,27 +1,46 @@
-a href="/lists" Return
+section#topBarOptions
+    section#pagePos
+        a class="removeDeco" href="/lists" Lists 
+        letter >
+        a class="removeDeco" href="" New PC list
+    section#componentTypes  
+                - @partTypes.each do |partType|
+                    button class="categoryBtn" #{partType}
 main id="wrapper"
     section id="formCreation"
         form action="/lists" method="POST"
             input type="text" name="listName" placeholder="PC List Name"
-            input id="CPUForm" type="text" name="cpu" placeholder="CPU" readonly = true
-            input type="text" name="gpu" placeholder="GPU"
-            input type="text" name="ram" placeholder="RAM"
-            input type="text" name="mobo" placeholder="MOBO"
-            input type="text" name="psu" placeholder="PSU"
-            input type="text" name="ssd" placeholder="SSD"
+            input id="CPU" type="text" name="cpu" placeholder="CPU" readonly = true
+            input id="GPU" type="text" name="gpu" placeholder="GPU"
+            input id="RAM" type="text" name="ram" placeholder="RAM"
+            input id="MOBO" type="text" name="mobo" placeholder="MOBO"
+            input id="PSU" type="text" name="psu" placeholder="PSU"
+            input id="SSD" type="text" name="ssd" placeholder="SSD"
             input type="submit" value="Create PC" class="postBtn helvetica"
     section id="itemListView"
-        section#componentTypes  
-            - @partTypes.each do |partType|
-                button class="" #{partType}
-        ul.componentInList 
-            - @components.each do |component|
-                section.item    
-                    li class="componentTitle" #{component["Model"]}
-                    section.description 
-                        label class="componentDesc openSans" #{component["Clock"]}
-                        label |
-                        label class="componentDesc openSans" #{component["Cores"]}
-                    button class="addToListbtn" ADD
-                hr
+            - @categories.each do |category|
+                - if category == @categories[0]
+                    section class="category"
+                        - category.each do |component|
+                                ul.componentInList 
+                                    section.item    
+                                        li class="componentTitle" #{component["model"]}
+                                        section.description 
+                                            label class="componentDesc openSans" #{component["clock"]}
+                                            label |
+                                            label class="componentDesc openSans" #{component["cores"]}
+                                        button class="addToListbtn" ADD
+                                    hr
+                - if category != @categories[0]
+                    section class="category hidden"
+                        - category.each do |component|
+                            ul.componentInList 
+                                section.item    
+                                    li class="componentTitle" #{component["model"]}
+                                    section.description 
+                                        label class="componentDesc openSans" #{component["clock"]}
+                                        label |
+                                        label class="componentDesc openSans" #{component["cores"]}
+                                    button class="addToListbtn" ADD
+                                hr
 script src="/js/main.js" 

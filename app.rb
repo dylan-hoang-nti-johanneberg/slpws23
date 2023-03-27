@@ -32,7 +32,7 @@ class DBexecutor
 
     def readAllProducts(category)
         selectTable = "SELECT * FROM #{category}"
-        $dbProducts.execute(selectTable)
+        return $dbProducts.execute(selectTable)
     end
 end
 
@@ -42,26 +42,32 @@ end
 
 get('/lists') do
     @lists = DBexecutor.new.readPCList()
-    slim(:"computerLists/lists")
+    slim(:"computerLists/index")
 end
 
 get('/lists/new') do
-    @partTypes = ['CPU', 'GPU', 'RAM']
-    @components = DBexecutor.new.readAllProducts(@partTypes[0])
-    for component in @components
-        component["Model"] = component["Model"].split(/ /, 3)
-        if component["Model"][1] == "Ryzen"
-            component["Model"] = "AMD #{component["Model"][1]} #{component["Model"][2]}"
-        elsif component["Model"][1] == "Core"
-            component["Model"] = "Intel #{component["Model"][1]} #{component["Model"][2]}"
-        end
+    @partTypes = ['CPU', 'GPU']
+    # , 'RAM', 'MOBO', 'PSU', 'SSD'
+    @categories = []
+    for partType in @partTypes
+        @categories.append(DBexecutor.new.readAllProducts(partType))
     end
+    # Kommer snart istället med relationstabeller 
+    # for component in @components
+    #     component["Model"] = component["Model"].split(/ /, 3)
+    #     if component["Model"][1] == "Ryzen"
+    #         component["Model"] = "AMD #{component["Model"][1]} #{component["Model"][2]}"
+    #     elsif component["Model"][1] == "Core"
+    #         component["Model"] = "Intel #{component["Model"][1]} #{component["Model"][2]}"
+    #     end
+    # end
+    p @categories
     slim(:"computerLists/new")
 end
 
 get('/lists/:id') do
     @components, @pcInfo= DBexecutor.new.readPCListContent(params[:id])
-    slim(:"computerLists/showList")
+    slim(:"computerLists/show")
 end
 
 post('/lists') do
