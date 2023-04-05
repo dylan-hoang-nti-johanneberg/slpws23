@@ -11,12 +11,24 @@ main id="wrapper"
         form action="/lists" method="POST"
             input type="text" name="listName" placeholder="PC List Name"
             input id="CPU" type="text" name="cpu" placeholder="CPU" readonly = true
-            input id="GPU" type="text" name="gpu" placeholder="GPU"
-            input id="RAM" type="text" name="ram" placeholder="RAM"
-            input id="MOBO" type="text" name="mobo" placeholder="MOBO"
-            input id="PSU" type="text" name="psu" placeholder="PSU"
-            input id="SSD" type="text" name="ssd" placeholder="SSD"
+            input id="CPU_id" type="hidden" name="cpu_id" placeholder="CPU" readonly = true
+            
+            input id="GPU" type="text" name="gpu" placeholder="GPU" readonly = true
+            input id="GPU_id" type="hidden" name="gpu_id" placeholder="GPU" readonly = true
+            
+            input id="RAM" type="text" name="ram" placeholder="RAM" readonly = true
+            input id="RAM_id" type="hidden" name="ram_id" placeholder="RAM" readonly = true
+            
+            input id="MOBO" type="text" name="mobo" placeholder="MOBO" readonly = true
+            input id="MOBO_id" type="hidden" name="mobo_id" placeholder="MOBO" readonly = true
+            
+            input id="PSU" type="text" name="psu" placeholder="PSU" readonly = true
+            input id="PSU_id" type="hidden" name="psu_id" placeholder="PSU" readonly = true
+
+            input id="SSD" type="text" name="ssd" placeholder="SSD" readonly = true
+            input id="SSD_id" type="hidden" name="ssd_id" placeholder="SSD" readonly = true
             input type="submit" value="Create PC" class="postBtn helvetica"
+
     section id="itemListView"
             - @categories.each do |category|
                 - if category == @categories[0]
@@ -24,23 +36,21 @@ main id="wrapper"
                         - category.each do |component|
                                 ul.componentInList 
                                     section.item    
-                                        li class="componentTitle" #{component["model"]}
-                                        section.description 
-                                            label class="componentDesc openSans" #{component["clock"]}
-                                            label |
-                                            label class="componentDesc openSans" #{component["cores"]}
+                                        li class="componentTitle" #{component["name"]}
+                                        section.description
+                                            label class="componentDesc openSans" #{component["desc"]}
                                         button class="addToListbtn" ADD
+                                        li class="hidden" #{component["id"]}
                                     hr
                 - if category != @categories[0]
                     section class="category hidden"
                         - category.each do |component|
                             ul.componentInList 
                                 section.item    
-                                    li class="componentTitle" #{component["model"]}
+                                    li class="componentTitle" #{component["name"]}
                                     section.description 
-                                        label class="componentDesc openSans" #{component["clock"]}
-                                        label |
-                                        label class="componentDesc openSans" #{component["cores"]}
+                                        label class="componentDesc openSans" #{component["desc"]}
                                     button class="addToListbtn" ADD
+                                    li class="hidden" #{component["id"]}
                                 hr
 script src="/js/main.js" 

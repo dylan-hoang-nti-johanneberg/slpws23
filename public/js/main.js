@@ -17,8 +17,11 @@ for (i = 0; i < allAddButtons.length; i++) {
     allAddButtons[i].addEventListener('click', function productClick() {
         selectedProduct = this.parentElement;
         selectedProductName = selectedProduct.firstChild.innerHTML;
-        let form = document.getElementById(currentCategory);
-        form.value = selectedProductName;
+        selectedProductID = selectedProduct.lastChild.innerHTML;
+        let formText = document.getElementById(currentCategory);
+        let formID = document.getElementById(`${currentCategory}_id`);
+        formText.value = selectedProductName;
+        formID.value = selectedProductID;
     })
 }
 

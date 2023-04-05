@@ -75,7 +75,7 @@ nav {
     display: grid;
     row-gap: 10px;
     list-style: none;
-    padding: 0;
+    padding: 0 0 10px;
 }
 
 .componentTitle {
@@ -127,13 +127,14 @@ button.addToListbtn {
 }
 
 .pcView {
-    width: 100%;
+    width: 60%;
     height: 250px;
-    padding: 1rem 1rem 0 0.5rem;
+    /* padding: 1rem 1rem 0 0.5rem; */
 }
 
 .tableDesc {
     font-size: 21px;
+    height: 21px;
 }
 
 #pagePos {
@@ -156,6 +157,54 @@ button.addToListbtn {
     overflow-y: scroll;
 }
 
+section#listViewTitle {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    column-gap: 1rem;
+}
+
 .hidden {
     display: none;
+}
+
+#pcViewTable {
+    height: 34px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+#pcIndex {
+    display: grid;
+    grid-template-columns: repeat(2, 2fr);
+    column-gap: 1.5rem;
+    row-gap: 1rem;
+    padding-top: 1rem;
+}
+
+#computer {
+    border-radius: 3px;
+    border: 1px solid black;
+    /* border-top: 1px solid black;
+    border-bottom: 1px solid black; */
+    padding: 5px 0 10px 15px;
+}
+
+.pcTitle {
+    color: black;
+    font-size: 21px;
+}
+
+#highlightedPC {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    padding-top: 10px;
+}
+
+img {
+    max-width: 100%;
+    border-radius: 1rem;
 }

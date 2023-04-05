@@ -1,6 +1,18 @@
-section
-    / p #{@lists}
-    - @lists.each do |list|
-        a class="openSans" href="/lists/#{list["id"]}"  #{list["name"]}
-        form class="openSans" action="/lists/#{list["id"]}/delete" method="post" 
-            input class="openSans" type="submit" value="Del" class="postBtn"
+section#pagePos
+    a class="removeDeco" href="/lists" Lists 
+    letter >
+
+section#wrapper
+    section#pcIndex
+        / p #{@lists}
+        - @formatedComputers.each do |computer|
+            section#computer
+                a class="helvetica removeDeco pcTitle" href="/lists/#{computer["id"]}"  #{computer["computerName"]}
+                - @computers.each do |component|
+                    - if computer["id"] == component["computerList_id"]
+                        li.openSans #{component["name"]}
+                form class="openSans" action="/lists/#{computer["id"]}/delete" method="post" 
+                    input class="openSans" type="submit" value="Del" class="postBtn"
+    section#highlightedPC 
+        h2.helvetica PC Hightlight of The Week
+        img src="/img/RGB_PC.jpg" alt="Picture of a Computer"

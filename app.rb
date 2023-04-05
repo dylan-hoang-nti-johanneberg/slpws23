@@ -2,26 +2,38 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'slim'
 require 'sqlite3'
+require 'bcrypt'
+
 # require_relative 'model'
 enable :sessions
 
-$db = SQLite3::Database.new("db/data.db")
+# $db = SQLite3::Database.new("db/data.db")
+# $db.results_as_hash = true
+
+$db = SQLite3::Database.new("db/products.db")
 $db.results_as_hash = true
 
-$dbProducts = SQLite3::Database.new("db/products.db")
-$dbProducts.results_as_hash = true
-
 class DBexecutor
-    def insertIntoPCList(name, cpu, gpu, ram, mobo, psu, ssd)
-        $db.execute("INSERT INTO computerList(name, cpu, gpu, ram, mobo, psu, ssd) VALUES(?,?,?,?,?,?,?)", name, cpu, gpu, ram, mobo, psu, ssd)
+    def insertIntoPCList(name, time, author_id)
+        $db.execute("INSERT INTO computerList(computerName, creationTime, author_id) VALUES(?,?,?)", name, time, author_id)
+        pcID = $db.execute("SELECT last_insert_rowid()")[0]["last_insert_rowid()"]
+        return insertIntoPCRelation(pcID)
+    end
+
+    def insertIntoPCRelation(pcID, components)
+        for component in components                 #clean code instead of one line SQL
+            $db.execute("INSERT INTO computerList_component_rel(computerList_id, product_id) VALUES (?,?)", pcID, component)
+        end
     end
 
     def readPCList()
-        return $db.execute("SELECT id, name FROM computerList")
+        return $db.execute("SELECT * FROM ((computerList_component_rel
+            INNER JOIN computerList ON computerList_component_rel.computerList_id = computerList.id)
+            INNER JOIN products ON computerList_component_rel.product_id = products.id)")
     end
 
     def readPCListContent(id)
-        pcComponents = $db.execute("SELECT cpu, gpu, ram, mobo psu, ssd FROM computerList WHERE id = ?", id)
+        pcComponents = $db.execute("SELECT * FROM (computerList_component_rel INNER JOIN products ON computerList_component_rel.product_id = products.id) WHERE computerList_id = ?", id)
         pcDescription = $db.execute("SELECT * FROM computerList WHERE id = ?", id)
         return pcComponents, pcDescription
     end
@@ -31,8 +43,24 @@ class DBexecutor
     end
 
     def readAllProducts(category)
-        selectTable = "SELECT * FROM #{category}"
-        return $dbProducts.execute(selectTable)
+        return $db.execute("SELECT * FROM products WHERE category = ?", category)
+    end
+
+    def readUserInfo(username)
+        return $db.execute("SELECT id, password FROM users WHERE username = ?", username)
+    end
+
+    def registerUser(username, password_digest, time, isAdmin)
+        return $db.execute("INSERT INTO users(username, password, creationTime, isAdmin) VALUES (?, ?, ?, ?)", username, password_digest, time, isAdmin)
+    end
+
+    def updateComputerRelation(id, components)
+        $db.execute("DELETE FROM computerList_component_rel WHERE computerList_id = ?", id)
+        return insertIntoPCRelation(id, components)
+    end
+
+    def updateComputer(name, id)
+        return $db.execute("UPDATE computerList SET computerName = ? WHERE id = ?", name, id)
     end
 end
 
@@ -41,44 +69,99 @@ get('/') do
 end
 
 get('/lists') do
-    @lists = DBexecutor.new.readPCList()
+    @computers = DBexecutor.new.readPCList()
+    @formatedComputers = []
+    for computer in @computers
+        if !@formatedComputers.include?({"computerName"=>computer["computerName"], "id"=>computer["computerList_id"]})
+            @formatedComputers.append({"computerName"=>computer["computerName"], "id"=>computer["computerList_id"]}) 
+        end
+    end
+
     slim(:"computerLists/index")
 end
 
 get('/lists/new') do
-    @partTypes = ['CPU', 'GPU']
-    # , 'RAM', 'MOBO', 'PSU', 'SSD'
+    @partTypes = ['CPU', 'GPU','RAM']
     @categories = []
     for partType in @partTypes
         @categories.append(DBexecutor.new.readAllProducts(partType))
     end
-    # Kommer snart istället med relationstabeller 
-    # for component in @components
-    #     component["Model"] = component["Model"].split(/ /, 3)
-    #     if component["Model"][1] == "Ryzen"
-    #         component["Model"] = "AMD #{component["Model"][1]} #{component["Model"][2]}"
-    #     elsif component["Model"][1] == "Core"
-    #         component["Model"] = "Intel #{component["Model"][1]} #{component["Model"][2]}"
-    #     end
-    # end
+    
     p @categories
     slim(:"computerLists/new")
 end
 
+get('/lists/:id/edit') do
+    @components, @pcInfo= DBexecutor.new.readPCListContent(params[:id])
+    @partTypes = ['CPU', 'GPU','RAM']
+    @categories = []
+
+    @componentsFormated = []
+    @componentsID = []
+    i = 0
+    while i < 6
+        if @components[i]!= nil
+            @componentsFormated.append(@components[i]["name"])
+            @componentsID.append(@components[i]["product_id"])
+        else
+            @componentsFormated.append("")
+            @componentsID.append("")
+        end
+        i += 1
+    end
+
+    for partType in @partTypes
+        @categories.append(DBexecutor.new.readAllProducts(partType))
+    end
+    slim(:"computerLists/edit")
+end
+
+post('/lists/:id/update') do
+    components = [
+        params[:cpu_id],
+        params[:gpu_id],
+        params[:ram_id],
+        params[:mobo_id],
+        params[:psu_id],
+        params[:ssd_id]]
+    
+    DBexecutor.new.updateComputer(
+        params[:listName],
+        params[:id]
+    )
+    DBexecutor.new.updateComputerRelation(
+        params[:id], 
+        components
+    )
+
+    redirect('/lists')
+end
+
 get('/lists/:id') do
     @components, @pcInfo= DBexecutor.new.readPCListContent(params[:id])
+    p @pcInfo
     slim(:"computerLists/show")
 end
 
-post('/lists') do
+post('/lists') do    
+    author_id = params[:author_id]
+    if params[:author_id] == nil
+        author_id = 0
+    end
+
+    components = [
+    params[:cpu_id],
+    params[:gpu_id],
+    params[:ram_id],
+    params[:mobo_id],
+    params[:psu_id],
+    params[:ssd_id]]
+
     DBexecutor.new.insertIntoPCList(
         params[:listName],
-        params[:cpu],
-        params[:gpu],
-        params[:ram],
-        params[:mobo],
-        params[:psu],
-        params[:ssd]
+        Time.new().to_i,
+        author_id,
+        components
     )
     redirect('/lists')
 end
@@ -91,8 +174,48 @@ post('/lists/:id/delete') do
 end
 
 get('/login') do
+    slim(:login)
 end
 
 get('/register') do 
+    slim(:register)
 end
 
+get('/logout') do
+    session.destroy
+    redirect('/')
+end
+
+post('/login') do
+    result = DBexecutor.new.readUserInfo(params[:username])
+    user_id = result.first["id"]
+    password_digest = result.first["password"]
+    if BCrypt::Password.new(password_digest) == params[:password]
+        session[:user_id] = user_id
+        p "ID!!! = "
+        p session[:user_id]
+        redirect('/lists')
+    else
+        redirect('/')
+    end
+
+end
+
+post('/register') do
+    password = params[:password]
+    passwordConfirm = params[:passwordConfirm]
+    result = DBexecutor.new.readUserInfo(params[:username])
+
+    if result.empty?
+        if password == passwordConfirm
+            password_digest = BCrypt::Password.create(password)
+            DBexecutor.new.registerUser(params[:username], password_digest, Time.new().to_i, 0)
+            redirect('/')
+        else
+            redirect('/')
+        end
+    else
+        redirect('/')
+    end
+
+end

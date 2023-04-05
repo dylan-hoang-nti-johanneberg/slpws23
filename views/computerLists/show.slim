@@ -1,20 +1,21 @@
 section#pagePos
     a class="removeDeco" href="/lists" Lists 
     letter >
-    a class="removeDeco" href="" #{@pcInfo[0]["name"]}
+    a class="removeDeco" href="" #{@pcInfo[0]["computerName"]}
 section#listViewWrapper
-    h2 class="title helvetica" #{@pcInfo[0]["name"]}
+    section#listViewTitle
+        h2 class="title helvetica" #{@pcInfo[0]["computerName"]}
+        a class="removeDeco openSans" href="/lists/#{@pcInfo[0]["id"]}/edit" Edit
     hr
     table.pcView
-        tr.helvetica.tableDesc
-            th  
+        tr.helvetica.tableDesc id="pcViewTable"
+            th Type
             th Product
             th Price
             th Store
-        - @components[0].each do |comp|
+        - @components.each do |component|
             tr.helvetica.tableDesc
-                - comp[0] = comp[0].upcase
-                td #{comp[0]} 
-                td #{comp[1]}
+                td #{component["category"]} 
+                td #{component["name"]}
             / br
             

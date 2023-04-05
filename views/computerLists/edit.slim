@@ -1,0 +1,61 @@
+section#topBarOptions
+    section#pagePos
+        a class="removeDeco" href="/lists" Lists 
+        letter >
+        a class="removeDeco" href="/lists/#{@pcInfo[0]["id"]}" #{@pcInfo[0]["computerName"]}
+        letter >
+        a class="removeDeco" href="/lists/#{@pcInfo[0]["id"]}/edit" Edit
+
+    section#componentTypes  
+                - @partTypes.each do |partType|
+                    button class="categoryBtn" #{partType}
+main id="wrapper"
+    section id="formCreation"
+        form action="/lists/#{@pcInfo[0]["id"]}/update" method="POST"
+            input type="text" name="listName" placeholder="PC List Name" value="#{@pcInfo[0]["computerName"]}"
+
+            input id="CPU" type="text" name="cpu" placeholder="CPU" readonly = true value="#{@componentsFormated[0]}"
+            input id="CPU_id" type="hidden" name="cpu_id" placeholder="CPU" readonly = true value="#{@componentsID[0]}"
+
+            
+            input id="GPU" type="text" name="gpu" placeholder="GPU" readonly = true value="#{@componentsFormated[1]}"
+            input id="GPU_id" type="hidden" name="gpu_id" placeholder="GPU" readonly = true value="#{@componentsID[1]}"
+            
+            input id="RAM" type="text" name="ram" placeholder="RAM" readonly = true value="#{@componentsFormated[2]}"
+            input id="RAM_id" type="hidden" name="ram_id" placeholder="RAM" readonly = true value="#{@componentsID[2]}"
+            
+            input id="MOBO" type="text" name="mobo" placeholder="MOBO" readonly = true value="#{@componentsFormated[3]}"
+            input id="MOBO_id" type="hidden" name="mobo_id" placeholder="MOBO" readonly = true value="#{@componentsID[3]}"
+            
+            input id="PSU" type="text" name="psu" placeholder="PSU" readonly = true value="#{@componentsFormated[4]}"
+            input id="PSU_id" type="hidden" name="psu_id" placeholder="PSU" readonly = true value="#{@componentsID[4]}"
+
+            input id="SSD" type="text" name="ssd" placeholder="SSD" readonly = true value="#{@componentsFormated[5]}"
+            input id="SSD_id" type="hidden" name="ssd_id" placeholder="SSD" readonly = true value="#{@componentsID[5]}"
+            input type="submit" value="Update PC" class="postBtn helvetica"
+
+    section id="itemListView"
+            - @categories.each do |category|
+                - if category == @categories[0]
+                    section class="category"
+                        - category.each do |component|
+                                ul.componentInList 
+                                    section.item    
+                                        li class="componentTitle" #{component["name"]}
+                                        section.description
+                                            label class="componentDesc openSans" #{component["desc"]}
+                                        button class="addToListbtn" ADD
+                                        li class="hidden" #{component["id"]}
+                                    hr
+                - if category != @categories[0]
+                    section class="category hidden"
+                        - category.each do |component|
+                            ul.componentInList 
+                                section.item    
+                                    li class="componentTitle" #{component["name"]}
+                                    section.description 
+                                        label class="componentDesc openSans" #{component["desc"]}
+                                    button class="addToListbtn" ADD
+                                    li class="hidden" #{component["id"]}
+                                hr
+script src="/js/main.js" 
