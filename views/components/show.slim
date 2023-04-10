@@ -1,0 +1,15 @@
+section#pagePos
+    a class="removeDeco" href="/components/" Components 
+    letter >
+    a class="removeDeco" href="/components/" #{@product[0]["category"]}
+
+section id="componentView"
+    section#listViewTitle
+            h2 class="title helvetica" #{@product[0]["name"]}
+            a class="removeDeco openSans" href="/components/#{@product[0]["id"]}/edit" Edit
+    / h2 class="title helvetica" #{@product[0]["name"]}
+
+    h3 class="helvetica" Description
+    label class="openSans" #{@product[0]["desc"]}
+
+    h3 class="helvetica" Price

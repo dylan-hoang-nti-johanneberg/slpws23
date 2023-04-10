@@ -1,7 +1,7 @@
-section#login 
+section#login class="flexCol"
     h2.helvetica Login
-    form action="login" method="POST"
-                    section class="textBox"
-                        input type="text" name="username" placeholder="Username"/
-                        input type="password" name="password" placeholder="Password"/
-                    input type="submit" value="Login" class="postBtn"/
+    form class="flexCol" action="/login" method="POST"
+        input.helvetica type="text" name="username" placeholder="Username"/
+        input.helvetica type="password" name="password" placeholder="Password"/
+        input.helvetica type="submit" value="Login" class="postBtn"/
+    a href="/register/" class="removeDeco colorBlack helvetica" No account? Sign Up

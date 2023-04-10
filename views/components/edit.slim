@@ -1,0 +1,24 @@
+section#pagePos
+    a class="removeDeco" href="/components/" Components 
+    letter >
+    a class="removeDeco" href="/components/" #{@product[0]["category"]}
+    letter >
+    a class="removeDeco" href="" #{@product[0]["name"]}
+    letter >
+    a class="removeDeco" href="" Edit
+
+
+section class="formGrid"
+    section id="formCreation"
+        form action="/components/#{@product[0]["id"]}/update" method="post" 
+            label class="openSans" Product Name
+            input type="text" name="name" placeholder="Name" value="#{@product[0]["name"]}"
+            label class="openSans" Description
+            input type="text" name="desc" placeholder="Description" value="#{@product[0]["desc"]}"
+            select class="formOption" name="category"
+                option value="#{@product[0]["category"]}" #{@product[0]["category"]}
+                - @partTypes.each do |type|
+                    - if type != @product[0]["category"]
+                        option value="#{type}" #{type}
+
+            input type="submit" value="Update Component" class="postBtn helvetica"

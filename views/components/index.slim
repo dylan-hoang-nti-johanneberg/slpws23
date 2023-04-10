@@ -1,0 +1,15 @@
+section#pagePos
+    a class="removeDeco" href="/components/" Components 
+    letter >
+section#componentsView
+    - @categories.each do |category|
+        section class="category componentIndex"
+            h2.helvetica #{category[0]["category"]} 
+            - category.each do |component|
+                section    
+                    a class="removeDeco componentTitle componentInList" href="/components/#{component["id"]}" #{component["name"]}
+                    section.description
+                        label class="componentDesc openSans" #{component["desc"]}
+                    li class="hidden" #{component["id"]}
+                            
+               

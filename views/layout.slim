@@ -5,14 +5,26 @@ html lang="en"
         meta http-equiv="X-UA-Compatible" content="IE=edge"/
         meta name="viewport" content="width=device-width, initial-scale=1.0"/
         link rel="stylesheet" href="/css/style.css"/
-        title Document
+        title PC Builder
     body
     
     header 
         a class="helvetica title removeDeco" href="/" PC Builder
-        nav
-            a class="navItems removeDeco" href="/lists" View lists
-            span.navItems |
-            a class="navItems removeDeco" href="/lists/new" Create new list
+        - if session[:user_id] != nil
+            nav
+                a class="navItems removeDeco" href="/lists/" View lists
+                span.navItems |
+                a class="navItems removeDeco" href="/lists/new" Create new list
+                span.navItems |
+                a class="navItems removeDeco" href="/components/" Components
+                span.navItems |
+                a class="navItems removeDeco" href="/user/#{session[:user_id]}/edit" Profile
+                span.navItems |
+                a class="navItems removeDeco" href="/logout/" Logout
+
+        - if session[:user_id] == nil
+            nav
+                a class="navItems removeDeco" href="/components/" Components
+
 
     ==yield 

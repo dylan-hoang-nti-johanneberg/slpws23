@@ -1,13 +1,16 @@
 section#pagePos
-    a class="removeDeco" href="/lists" Lists 
+    a class="removeDeco" href="/lists/" Lists 
     letter >
 
 section#wrapper
     section#pcIndex
         / p #{@lists}
         - @formatedComputers.each do |computer|
-            section#computer
+            section class="computer flexCol"
                 a class="helvetica removeDeco pcTitle" href="/lists/#{computer["id"]}"  #{computer["computerName"]}
+                - for user in @users
+                    - if user["id"] == computer["author_id"]
+                        label class="helvetica removeDeco pcTitle" created by #{user["username"]}
                 - @computers.each do |component|
                     - if computer["id"] == component["computerList_id"]
                         li.openSans #{component["name"]}

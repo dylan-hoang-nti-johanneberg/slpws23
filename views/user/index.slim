@@ -1,0 +1,21 @@
+section#allUsers class="flexCol"
+    h2.helvetica All Users
+    
+    - @users.each do |user|
+        section
+            section.flexRow
+                - if user["isAdmin"] == 1
+                    - if user["id"] == session[:user_id]
+                        h2 class="helvetica smallTitle redText" * [Admin] #{user["username"]} 
+                    - if user["id"] != session[:user_id]
+                        h2 class="helvetica smallTitle redText" [Admin] #{user["username"]}
+                        
+
+                - if user["isAdmin"] == 0
+                    h2 class="helvetica smallTitle" #{user["username"]}
+                a class="removeDeco helvetica colorBlue smallTitle" href="/user/#{user["id"]}/edit" Edit
+            section.user
+                label.openSans Account created: #{Time.at(user["creationTime"].to_i)}
+                form class="openSans" action="/user/#{user["id"]}/delete" method="post" 
+                        input class="openSans" type="submit" value="Del" class="postBtn"
+    label.ptSans * Current logged in User
