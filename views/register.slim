@@ -1,8 +1,8 @@
 section#register class="flexCol"
     h2.helvetica Register
     form class="flexCol" action="/register" method="POST"
-        input.helvetica type="text" name="username" placeholder="Username"/
-        input.helvetica type="password" name="password" placeholder="Password"/
-        input.helvetica type="password" name="passwordConfirm" placeholder="Confirm Password"/
+        input.helvetica type="text" name="username" placeholder="Username" required = true
+        input.helvetica type="password" name="password" placeholder="Password" required = true
+        input.helvetica type="password" name="passwordConfirm" placeholder="Confirm Password" required = true
         input.helvetica type="submit" value="Register" class="postBtn"/
     a href="/login/" class="removeDeco colorBlack helvetica" Already Have an account? Sign in

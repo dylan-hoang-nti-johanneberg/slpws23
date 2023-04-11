@@ -12,7 +12,7 @@ section#topBarOptions
 main id="wrapper"
     section id="formCreation"
         form action="/lists/#{@pcInfo[0]["id"]}/update" method="POST"
-            input type="text" name="listName" placeholder="PC List Name" value="#{@pcInfo[0]["computerName"]}"
+            input type="text" name="listName" placeholder="PC List Name" value="#{@pcInfo[0]["computerName"]}" required = true
 
             input id="CPU" type="text" name="cpu" placeholder="CPU" readonly = true value="#{@componentsFormated[0]}"
             input id="CPU_id" type="hidden" name="cpu_id" placeholder="CPU" readonly = true value="#{@componentsID[0]}"

@@ -9,8 +9,8 @@ section#topBarOptions
 main id="wrapper"
     section id="formCreation"
         form action="/lists" method="POST"
-            input type="text" name="listName" placeholder="PC List Name"
-            input id="CPU" type="text" name="cpu" placeholder="CPU" readonly = true
+            input type="text" name="listName" placeholder="PC List Name" required = true
+            input id="CPU" type="text" name="cpu" placeholder="CPU" readonly = true 
             input id="CPU_id" type="hidden" name="cpu_id" placeholder="CPU" readonly = true
             
             input id="GPU" type="text" name="gpu" placeholder="GPU" readonly = true

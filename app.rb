@@ -3,94 +3,8 @@ require 'sinatra/reloader'
 require 'slim'
 require 'sqlite3'
 require 'bcrypt'
-
-# require_relative 'model'
+require_relative 'model'
 enable :sessions
-
-# $db = SQLite3::Database.new("db/data.db")
-# $db.results_as_hash = true
-
-$db = SQLite3::Database.new("db/products.db")
-$db.results_as_hash = true
-
-class DBexecutor
-    def insertIntoPCList(name, time, author_id, components)
-        $db.execute("INSERT INTO computerList(computerName, creationTime, author_id) VALUES(?,?,?)", name, time, author_id)
-        pcID = $db.execute("SELECT last_insert_rowid()")[0]["last_insert_rowid()"]
-        return insertIntoPCRelation(pcID, components)
-    end
-
-    def insertIntoPCRelation(pcID, components)
-        for component in components                 #clean code instead of one line SQL
-            $db.execute("INSERT INTO computerList_component_rel(computerList_id, product_id) VALUES (?,?)", pcID, component)
-        end
-    end
-
-    def readPCList(id)
-        return $db.execute("SELECT * FROM computerList WHERE id = ?", id)
-    end
-
-    def readPCLists()
-        return $db.execute("SELECT * FROM ((computerList_component_rel
-            INNER JOIN computerList ON computerList_component_rel.computerList_id = computerList.id)
-            INNER JOIN products ON computerList_component_rel.product_id = products.id)")
-    end
-
-    def readPCListContent(id)
-        pcComponents = $db.execute("SELECT * FROM (computerList_component_rel INNER JOIN products ON computerList_component_rel.product_id = products.id) WHERE computerList_id = ?", id)
-        pcDescription = $db.execute("SELECT * FROM computerList WHERE id = ?", id)
-        return pcComponents, pcDescription
-    end
-
-    def deletePCList(id)
-        $db.execute("DELETE FROM computerList WHERE id = ?", id)
-    end
-
-    def readProduct(id)
-        return $db.execute("SELECT * FROM products WHERE id = ?", id)
-    end
-
-    def readAllProducts(category)
-        return $db.execute("SELECT * FROM products WHERE category = ?", category)
-    end
-
-    def readUserInfo(username)
-        return $db.execute("SELECT id, password, isAdmin FROM users WHERE username = ?", username)
-    end
-
-    def registerUser(username, password_digest, time, isAdmin)
-        return $db.execute("INSERT INTO users(username, password, creationTime, isAdmin) VALUES (?, ?, ?, ?)", username, password_digest, time, isAdmin)
-    end
-
-    def updateComputerRelation(id, components)
-        $db.execute("DELETE FROM computerList_component_rel WHERE computerList_id = ?", id)
-        return insertIntoPCRelation(id, components)
-    end
-
-    def updateComputer(name, id)
-        return $db.execute("UPDATE computerList SET computerName = ? WHERE id = ?", name, id)
-    end
-
-    def updateComponent(name, desc, category, id)
-        return $db.execute("UPDATE products SET name = ?, desc = ?, category = ? WHERE id = ?", name, desc, category, id)
-    end
-
-    def readAllUsers()
-        return $db.execute("SELECT username, id, creationTime, isAdmin FROM users")
-    end
-    
-    def readUser(id)
-        return $db.execute("SELECT id, username, creationTime, isAdmin FROM users WHERE id = ?", id)
-    end
-
-    def updateUsername(id, username)
-        return $db.execute("UPDATE users SET username = ? WHERE id = ?", username, id)
-    end
-
-    def deleteUser(id)
-        $db.execute("")
-    end
-end
 
 def isLoggedIn()
     if session[:user_id].nil?
@@ -268,6 +182,12 @@ get('/login/') do
     slim(:login)
 end
 
+get('/login/error/:errorMSG') do
+    @errors = ["Too many logins!", "Invalid credentials!"]
+    @error = @errors[params[:errorMSG].to_i]
+    slim(:login)
+end
+
 get('/register/') do 
     slim(:register)
 end
@@ -279,9 +199,17 @@ end
 
 post('/login') do
     result = DBexecutor.new.readUserInfo(params[:username])
-    if result == []
-        redirect('/login/')
+    if session[:time].nil?
+        session[:time] = Time.new()
+    elsif (Time.new-session[:time]) < 4
+        p "EEEEERR"
+        redirect('/login/error/0')
     end
+
+    if result == []
+        redirect('/login/error/1')
+    end
+
     
     user_id = result.first["id"]
     password_digest = result.first["password"]
@@ -298,7 +226,8 @@ post('/login') do
 
         redirect('/lists/')
     else
-        redirect('/')
+        session[:time] = Time.new()
+        redirect('/login/error/1')
     end
 
 end
@@ -330,6 +259,35 @@ get('/components/') do
     end
     slim(:'components/index')
 end
+
+before('/components/new') do
+    isLoggedIn()
+    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
+        redirect('/components/')
+    end
+end
+
+get('/components/new') do
+    @partTypes = ['CPU', 'GPU','RAM']
+    @categories = []
+    for partType in @partTypes
+        @categories.append(DBexecutor.new.readAllProducts(partType))
+    end
+    slim(:'components/new')
+end
+
+before('/components') do
+    isLoggedIn()
+    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
+        redirect('/components/')
+    end
+end
+
+post('/components') do
+    DBexecutor.new.newComponent(params[:name], params[:category], params[:desc])
+    redirect('/components/')
+end
+
 
 get('/components/:id') do
     @product = DBexecutor.new.readProduct(params[:id])
@@ -364,6 +322,18 @@ post('/components/:id/update') do
         params[:id]
     )
 
+    redirect('/components/')
+end
+
+before('/components/:id/delete') do
+    isLoggedIn()
+    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
+        redirect('/components/')
+    end
+end
+
+post('/components/:id/delete') do
+    DBexecutor.new.deleteComponent(params[:id])
     redirect('/components/')
 end
 
@@ -411,5 +381,7 @@ before('/user/:id/delete') do
 end
 
 post('/user/:id/delete') do
-
+    DBexecutor.new.deleteAllUserPCList(params[:id])
+    DBexecutor.new.deleteUser(params[:id])
+    redirect('/user/')
 end

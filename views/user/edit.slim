@@ -1,12 +1,15 @@
 section#login class="flexCol"
     h2.helvetica Hello, #{@user[0]["username"]}!
+    hr
     label.openSans Update profile:
     form class="flexCol" action="/user/#{@user[0]["id"]}/update" method="POST"
-        input.helvetica type="text" name="username" placeholder="Username"/
-        input.helvetica type="submit" value="Apply" class="postBtn"/
+        input.helvetica type="text" name="username" placeholder="Username" required = true
+        input.helvetica type="submit" value="Apply" class="postBtn"
     label.openSans Account created: #{Time.at(@user[0]["creationTime"].to_i)}
 
     - if session[:isAdmin] == true 
-        section#adminTools
+        section#adminTools class="flexCol"
             h2.helvetica Admin Tools
-            a.openSans href="/user/" All users 
+            hr
+            a class="openSans colorBlue" href="/user/" All Users
+            a class="openSans colorBlue" href="/components/new" Add New Component

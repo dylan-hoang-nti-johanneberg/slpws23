@@ -10,6 +10,8 @@ section#componentsView
                     a class="removeDeco componentTitle componentInList" href="/components/#{component["id"]}" #{component["name"]}
                     section.description
                         label class="componentDesc openSans" #{component["desc"]}
-                    li class="hidden" #{component["id"]}
+                        - if session[:isAdmin] == true
+                            form class="openSans" action="/components/#{component["id"]}/delete" method="post" 
+                                input class="openSans" type="submit" value="Del" class="postBtn"
                             
                

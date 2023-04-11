@@ -1,0 +1,48 @@
+section#topBarOptions
+    section#pagePos
+        a class="removeDeco" href="/components/" Components 
+        letter >
+        a class="removeDeco" href="" New Component
+    section#componentTypes  
+        - @partTypes.each do |partType|
+            button class="categoryBtn" #{partType}
+
+section#componentTitles
+    label class="openSans title" for="username" Create New Component
+    label class="openSans title" for="username" List of Components
+main id="wrapper"
+    section id="formCreation"
+
+        form class="flexCol" action="/components" method="POST"
+            label class="openSans" for="name" Product Name
+            input type="text" name="name" placeholder="Name" required = true
+
+            label class="openSans" for="desc" Description
+            input type="text" name="desc" placeholder="Description" required = true
+            
+            select class="formOption" name="category"
+                - @partTypes.each do |type|
+                    option value="#{type}" #{type}
+            input type="submit" value="Create Component" class="postBtn helvetica"
+
+    section id="itemListView"
+        - @categories.each do |category|
+            - if category == @categories[0]
+                section class="category"
+                    - category.each do |component|
+                            ul.componentInList 
+                                section    
+                                    li class="componentTitle" #{component["name"]}
+                                    section.description
+                                        label class="componentDesc openSans" #{component["desc"]}
+                                hr
+            - if category != @categories[0]
+                section class="category hidden"
+                    - category.each do |component|
+                        ul.componentInList 
+                            section 
+                                li class="componentTitle" #{component["name"]}
+                                section.description 
+                                    label class="componentDesc openSans" #{component["desc"]}
+                            hr
+script src="/js/main.js" 

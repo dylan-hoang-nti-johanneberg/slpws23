@@ -1,7 +1,9 @@
 section#login class="flexCol"
     h2.helvetica Login
+    - if !@error.nil?
+        p class="openSans redText" #{@error}
     form class="flexCol" action="/login" method="POST"
-        input.helvetica type="text" name="username" placeholder="Username"/
-        input.helvetica type="password" name="password" placeholder="Password"/
+        input.helvetica type="text" name="username" placeholder="Username" required = true
+        input.helvetica type="password" name="password" placeholder="Password" required = true
         input.helvetica type="submit" value="Login" class="postBtn"/
     a href="/register/" class="removeDeco colorBlack helvetica" No account? Sign Up
