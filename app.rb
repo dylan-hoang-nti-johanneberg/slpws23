@@ -42,14 +42,53 @@ def trueAdmin(userID)
     return user[0]["isAdmin"] == 1
 end
 
+['/lists/', '/lists/new', '/lists/:id', '/lists'].each do |route|
+    before(route) do
+        isLoggedIn()
+    end
+end
+
+['/lists/:id/edit', '/lists/:id/update', '/lists/:id/delete'].each do |route|
+    before(route) do
+        isLoggedIn()
+        if session[:isAdmin] == false && !trueAdmin(session[:user_id])
+            authorID = DBexecutor.new.readPCList(params[:id])
+            authorizedUser(authorID[0]["author_id"])
+        end
+    end
+end
+
+['/components/new', '/components', '/components/:id/edit', '/components/:id/update', '/components/:id/delete'].each do |route|
+    before(route) do
+        isLoggedIn()
+        if session[:isAdmin] == false && !trueAdmin(session[:user_id])
+            redirect('/components/')
+        end
+    end
+end
+
+['/user/:id/update', '/user/:id/edit'].each do |route|
+    before(route) do
+        isLoggedIn()
+        if session[:isAdmin] == false && !trueAdmin(session[:user_id])
+            authorizedUser(params[:id].to_i)
+        end
+    end
+end
+
+['/user/', '/users/', '/user/:id/delete'].each do |route|
+    before(route) do
+        isLoggedIn()
+        if session[:isAdmin] == false && !trueAdmin(session[:user_id])
+            redirect('/lists/')
+        end
+    end
+end
+
 # Display Landing Page
 #
 get('/') do
     slim(:home)
-end
-
-before('/lists/') do
-    isLoggedIn()
 end
 
 # Displays a index of all computer lists
@@ -69,10 +108,6 @@ get('/lists/') do
     slim(:"computerLists/index")
 end
 
-before('/lists/new') do
-    isLoggedIn()
-end
-
 # Displays a creation form for a computer list
 #
 # @see DBexecutor#readAllProducts
@@ -84,14 +119,6 @@ get('/lists/new') do
     end
     
     slim(:"computerLists/new")
-end
-
-before('/lists/:id/edit') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        authorID = DBexecutor.new.readPCList(params[:id])
-        authorizedUser(authorID[0]["author_id"])
-    end
 end
 
 # Display a form to edit a specific computer list
@@ -124,14 +151,6 @@ get('/lists/:id/edit') do
         @categories.append(DBexecutor.new.readAllProducts(partType))
     end
     slim(:"computerLists/edit")
-end
-
-before('/lists/:id/update') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        authorID = DBexecutor.new.readPCList(params[:id])
-        authorizedUser(authorID[0]["author_id"])
-    end
 end
 
 # Updates an existing computer list and redirects to '/lists/'
@@ -168,10 +187,6 @@ post('/lists/:id/update') do
     redirect('/lists/')
 end
 
-before('/lists/:id') do
-    isLoggedIn()
-end
-
 # Displays components and name in a computer list
 #
 # @param [Integer] :id, ID of the computer list
@@ -181,10 +196,6 @@ get('/lists/:id') do
     @components, @pcInfo= DBexecutor.new.readPCListContent(params[:id])
     p @pcInfo
     slim(:"computerLists/show")
-end
-
-before('/lists') do
-    isLoggedIn()
 end
 
 # Creates a new computer list with components and redirects to '/lists/'
@@ -221,14 +232,6 @@ post('/lists') do
         components
     )
     redirect('/lists/')
-end
-
-before('/lists/:id/delete') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        authorID = DBexecutor.new.readPCList(params[:id])
-        authorizedUser(authorID[0]["author_id"])
-    end
 end
 
 # Deletes a computer list and redirects to '/lists/'
@@ -283,7 +286,6 @@ post('/login') do
     if session[:time].nil?
         session[:time] = Time.new()
     elsif (Time.new-session[:time]) < 4
-        p "EEEEERR"
         redirect('/login/error/0')
     end
 
@@ -295,7 +297,6 @@ post('/login') do
     password_digest = result.first["password"]
     if BCrypt::Password.new(password_digest) == params[:password]
         session[:user_id] = user_id
-        p "ID!!! = "
         p session[:user_id]
 
         if result.first["isAdmin"] == 1
@@ -351,13 +352,6 @@ get('/components/') do
     slim(:'components/index')
 end
 
-before('/components/new') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        redirect('/components/')
-    end
-end
-
 # Displays a creation form to create a new component
 #
 # @see DBexecutor#readAllProducts
@@ -368,13 +362,6 @@ get('/components/new') do
         @categories.append(DBexecutor.new.readAllProducts(partType))
     end
     slim(:'components/new')
-end
-
-before('/components') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        redirect('/components/')
-    end
 end
 
 # Creates a new component and redirects to '/components/'
@@ -399,13 +386,6 @@ get('/components/:id') do
     slim(:'components/show')
 end
 
-before('/components/:id/edit') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        redirect('/components/')
-    end
-end
-
 # Displays an edit form to update a component
 #
 # @param [Integer] :id, ID of the component
@@ -415,13 +395,6 @@ get('/components/:id/edit') do
     @partTypes = ['CPU', 'GPU', 'RAM']
     @product = DBexecutor.new.readProduct(params[:id])
     slim(:'components/edit')
-end
-
-before('/components/:id/update') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        redirect('/components/')
-    end
 end
 
 # Updates an existing component and redirects to '/components/'
@@ -443,13 +416,6 @@ post('/components/:id/update') do
     redirect('/components/')
 end
 
-before('/components/:id/delete') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        redirect('/components/')
-    end
-end
-
 # Deletes a component and redirects to '/components/'
 #
 # @param [Integer] :id, ID of the component
@@ -460,13 +426,6 @@ post('/components/:id/delete') do
     redirect('/components/')
 end
 
-before('/user/:id/edit') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        authorizedUser(params[:id].to_i)
-    end
-end
-
 # Displays an edit form to update a user
 #
 # @param [Integer] :id, ID of the user
@@ -475,13 +434,6 @@ end
 get('/user/:id/edit') do
     @user = DBexecutor.new.readUser(params[:id])
     slim(:'user/edit')
-end
-
-before('/user/:id/update') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        authorizedUser(params[:id].to_i)
-    end
 end
 
 # Updates an existing user and redirects to '/lists/'
@@ -495,26 +447,12 @@ post('/user/:id/update') do
     redirect('/lists/')
 end
 
-before('/user/') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        redirect('/lists/')
-    end
-end
-
 # Displays an index of all registered users
 #
 # @see DBexecutor#readAllUsers
 get('/user/') do
     @users = DBexecutor.new.readAllUsers()
     slim(:'user/index')
-end
-
-before('/user/:id/delete') do
-    isLoggedIn()
-    if session[:isAdmin] == false && !trueAdmin(session[:user_id])
-        redirect('/lists/')
-    end
 end
 
 # Deletes an user and redirects to '/user/'

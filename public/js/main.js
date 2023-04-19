@@ -5,6 +5,7 @@ let currentCategory = "CPU"
 
 function createCategoryArray() {
     let categoryArray = document.getElementById("componentTypes").childNodes;
+    console.log(categoryArray)
 
     for (i = 0; i < categoryArray.length; i++) {
         if (currentCategory == categoryArray[i].innerHTML) {
@@ -18,8 +19,10 @@ for (i = 0; i < allAddButtons.length; i++) {
         selectedProduct = this.parentElement;
         selectedProductName = selectedProduct.firstChild.innerHTML;
         selectedProductID = selectedProduct.lastChild.innerHTML;
+        console.log(selectedProduct, selectedProductID, selectedProductName)
         let formText = document.getElementById(currentCategory);
         let formID = document.getElementById(`${currentCategory}_id`);
+        console.log(formID, formText);
         formText.value = selectedProductName;
         formID.value = selectedProductID;
     })
